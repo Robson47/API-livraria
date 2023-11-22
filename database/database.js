@@ -27,3 +27,7 @@ const connection = new sequelize(
 );
 
 module.exports = connection;
+
+
+
+

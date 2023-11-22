@@ -1,13 +1,13 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
-const upload = require('../helper/upload/uploadImg');
+const upload = require('../helpers/upload/uploadImg');
 const livro = require('../model/Livro');
-
 const { initializeApp, FirebaseError } = require('firebase/app');
 const { getStorage, ref, getDownloadURL, uploadBytes, listAll, deleteObject } = require('firebase/storage');
+const deleteImage = require('../helpers/upload/deleteImagem');
 
-require('dotenv').config();
+require("dotenv").config()
 
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
@@ -19,6 +19,8 @@ const firebaseConfig = {
     measurementId: process.env.MEASUREMENT_ID
 };
 
+console.log(firebaseConfig);
+
 const firebaseApp = initializeApp(firebaseConfig);
 
 const storage = getStorage(firebaseApp);
@@ -26,6 +28,8 @@ const storage = getStorage(firebaseApp);
 router.post('/livro/cadastrarLivro', upload.array('files', 2), (req, res) => {
     const { titulo, preco, detalhes, codigo_categoria } = req.body;
     const files = req.files;
+
+    console.log(req);
 
     let imagem_peq_url, imagem_grd_url, imagem_peq, imagem_grd;
     let cont = 0;
@@ -109,23 +113,25 @@ router.delete('/livro/excluirLivro/:codigo_livro', (req, res) => {
     const { codigo_livro } = req.params;
 
     livro.findByPk(codigo_livro)
-        .then(
+        .then((livro) => {
+            deleteImage(livro.imagem_peq);
+            deleteImage(livro.imagem_grd);
             livro.destroy({
                 where: { codigo_livro }
-            })).then(
-                () => {
+            })
+                .then(() => {
                     return res.status(200).json({
                         erroStatus: false,
-                        mensagemStatus: 'Livro excluído com sucesso.'
+                        mensagemStatus: 'Livro excluído com sucesso'
                     });
-
-                }).catch((erro) => {
+                })
+                .catch((erro) => {
                     return res.status(400).json({
                         erroStatus: true,
-                        erroMensagem: erro
+                        mensagemStatus: erro
                     });
                 });
-
+        });
 });
 
 router.put('/livro/editarLivro', (req, res) => {
