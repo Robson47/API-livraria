@@ -8,3 +8,18 @@ Antes de começar, certifique-se de ter o Node.js e o npm instalados em sua máq
 
 ```bash
 cp .env.example .env
+
+```
+
+Instale as dependências do projeto com o seguinte comando:
+```bash
+npm install
+```
+Certifique-se de ter configurado corretamente o arquivo "database.js" com as configurações do seu banco de dados
+
+## Iniciando a Aplicação
+
+Inicie o servidor localmento com o seguinte comando:
+```bash
+npm start
+```
