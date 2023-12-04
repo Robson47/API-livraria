@@ -8,10 +8,10 @@ const connection = require('../database/database');
 representanto a cardinalidade*/
 const Categoria = require('./Categoria');
 
-const Livro = connection.define(
-    'tbl_livros',
+const Produtos = connection.define(
+    'tbl_produtos',
     {
-        codigo_livro:{
+        codigo_produto:{
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true
@@ -20,31 +20,23 @@ const Livro = connection.define(
             type: Sequelize.INTEGER,
             allowNull: false
         },
-        titulo:{
+        nome_produto:{
             type: Sequelize.STRING,
             allowNull: false
         },
-        preco:{
+        preco_produto:{
             type: Sequelize.STRING,
             allowNull: false
         },
-        imagem_peq:{
+        imagem_produto:{
             type: Sequelize.STRING,
             allowNull: false
         },
-        imagem_grd:{
+        imagem_produto_url:{
             type: Sequelize.STRING,
             allowNull: false
         },
-        imagem_peq_url:{
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        imagem_grd_url:{
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        detalhes:{
+        descricao_produto:{
             type: Sequelize.TEXT,
             allowNull: false
         }
@@ -52,17 +44,17 @@ const Livro = connection.define(
 );
 
 /*Implementação da  CHAVE ESTRANGEIRA - LADO N*/
-Categoria.hasMany(Livro, {
+Categoria.hasMany(Produtos, {
     foreignKey: 'codigo_categoria',
     sourceKey: 'codigo_categoria'
 });
 
 /*Implementação da  CHAVE PRIMÁRIA - LADO 1*/
-Livro.belongsTo(Categoria, {
+Produtos.belongsTo(Categoria, {
     foreignKey: 'codigo_categoria',
     sourceKey: 'codigo_categoria'
 });
 
-Livro.sync({force:false});
+Produtos.sync({force:false});
 
-module.exports = Livro;
+module.exports = Produtos;

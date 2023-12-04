@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const upload = require('../helpers/upload/uploadImg');
-const livro = require('../model/Livro');
+const produto = require('../model/Produto');
 const { initializeApp, FirebaseError } = require('firebase/app');
 const { getStorage, ref, getDownloadURL, uploadBytes, listAll, deleteObject } = require('firebase/storage');
 const deleteImage = require('../helpers/upload/deleteImagem');
@@ -25,13 +25,13 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 const storage = getStorage(firebaseApp);
 
-router.post('/livro/cadastrarLivro', upload.array('files', 2), (req, res) => {
-    const { titulo, preco, detalhes, codigo_categoria } = req.body;
+router.post('/prod/cadastrarProduto', upload.array('files', 1), (req, res) => {
+    const { nome_produto, preco_produto, descricao_produto, codigo_categoria } = req.body;
     const files = req.files;
 
     console.log(req);
 
-    let imagem_peq_url, imagem_grd_url, imagem_peq, imagem_grd;
+    let imagem_produto, imagem_produto_url;
     let cont = 0;
 
     files.forEach(file => {
@@ -44,25 +44,19 @@ router.post('/livro/cadastrarLivro', upload.array('files', 2), (req, res) => {
                 getDownloadURL(imageRef)
                     .then((urlFinal) => {
                         if (cont == 0) {
-                            imagem_peq = fileName;
-                            imagem_peq_url = urlFinal;
+                            imagem_produto = fileName;
+                            imagem_produto_url = urlFinal;
                             cont++;
-                            console.log('Nome da imagem peq ' + imagem_peq);
-                            console.log('URL da imagem peq ' + imagem_peq_url);
-                        } else {
-                            imagem_grd = fileName;
-                            imagem_grd_url = urlFinal;
-                            console.log('Nome da imagem grd ' + imagem_grd);
-                            console.log('URL da imagem grd ' + imagem_grd_url);
-                        }
-
-                        if (imagem_peq && imagem_grd) {
-                            //GRAVAÇÃO DOS LIVROS NO BANCO DE DADOS
-                            livro.create({ titulo, preco, imagem_peq, imagem_grd, imagem_peq_url, imagem_grd_url, detalhes, codigo_categoria })
+                            console.log('Nome da imagem peq ' + imagem_produto);
+                            console.log('URL da imagem peq ' + imagem_produto_url);
+                        } 
+                        if (imagem_produto) {
+                            //GRAVAÇÃO DOS ProdutoS NO BANCO DE DADOS
+                            produto.create({ nome_produto, preco_produto, imagem_produto, imagem_produto_url, descricao_produto, codigo_categoria })
                                 .then(() => {
                                     return res.status(201).json({
                                         erroStatus: false,
-                                        mensagemStatus: 'Livro inserido com sucesso.'
+                                        mensagemStatus: 'Produto inserido com sucesso.'
                                     });
                                 }
                                 ).catch((erro) => {
@@ -80,11 +74,11 @@ router.post('/livro/cadastrarLivro', upload.array('files', 2), (req, res) => {
     });
 });
 
-router.get('/livro/listarLivro', (req, res) => {
+router.get('/prod/listarProduto', (req, res) => {
 
-    livro.findAll()
-        .then((livros) => {
-            return res.status(200).json(livros)
+    produto.findAll()
+        .then((produto) => {
+            return res.status(200).json(produto)
         }).catch((erro) => {
             return res.status(400).json({
                 erroStatus: true,
@@ -93,13 +87,13 @@ router.get('/livro/listarLivro', (req, res) => {
         });
 });
 
-router.get('/livro/listarLivroCodigo/:codigo_livro', (req, res) => {
+router.get('/prod/listarProdutoCodigo/:codigo_produto', (req, res) => {
 
-    const { codigo_livro } = req.params
+    const { codigo_produto } = req.params
 
-    livro.findByPk(codigo_livro)
-        .then((livro) => {
-            return res.status(200).json(livro)
+    produto.findByPk(codigo_produto)
+        .then((produto) => {
+            return res.status(200).json(produto)
         }).catch((erro) => {
             return res.status(400).json({
                 erroStatus: true,
@@ -108,21 +102,20 @@ router.get('/livro/listarLivroCodigo/:codigo_livro', (req, res) => {
         });
 });
 
-router.delete('/livro/excluirLivro/:codigo_livro', (req, res) => {
+router.delete('/prod/excluirProduto/:codigo_produto', (req, res) => {
 
-    const { codigo_livro } = req.params;
+    const { codigo_produto } = req.params;
 
-    livro.findByPk(codigo_livro)
-        .then((livro) => {
-            deleteImage(livro.imagem_peq);
-            deleteImage(livro.imagem_grd);
-            livro.destroy({
-                where: { codigo_livro }
+    produto.findByPk(codigo_produto)
+        .then((produto) => {
+            deleteImage(produto.imagem_produto);
+            produto.destroy({
+                where: { codigo_produto }
             })
                 .then(() => {
                     return res.status(200).json({
                         erroStatus: false,
-                        mensagemStatus: 'Livro excluído com sucesso'
+                        mensagemStatus: 'Produto excluído com sucesso'
                     });
                 })
                 .catch((erro) => {
@@ -134,17 +127,17 @@ router.delete('/livro/excluirLivro/:codigo_livro', (req, res) => {
         });
 });
 
-router.put('/livro/editarLivro', (req, res) => {
+router.put('/prod/editarProduto', (req, res) => {
 
-    const { titulo, preco, detalhes, imagem_grd, imagem_peq, codigo_categoria, codigo_livro } = req.body;
+    const { nome_produto, preco_produto, descricao_produto, imagem_produto, imagem_produto_url, codigo_categoria, codigo_produto } = req.body;
     /** UPDATE SEM IMAGEM **/
-    livro.update({ titulo, preco, detalhes, imagem_grd, imagem_peq, codigo_categoria, codigo_livro },
-        { where: { codigo_livro } }
+    produto.update({ nome_produto, preco_produto, descricao_produto, imagem_produto, imagem_produto_url, codigo_categoria, codigo_produto },
+        { where: { codigo_produto } }
     ).then(
         () => {
             return res.status(200).json({
                 erroStatus: false,
-                mensagemStatus: 'Livro alterado com sucesso.'
+                mensagemStatus: 'Produto alterado com sucesso.'
             });
         }).catch((erro) => {
             return res.status(400).json({

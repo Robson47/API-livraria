@@ -1,18 +1,17 @@
 const express = require("express");
 
-const categoriaModel = require("../model/Categoria");
-const livroModel = require("../model/Livro");
+const categoria = require("../model/Categoria");
 
 const router = express.Router();
 
 //ROTA DE INSERÇÃO DE CATEGORIA
 
 router.post("/categoria/cadastrarCategoria", (req, res) => {
-    let { nome_categoria, tipo_categoria } = req.body;
+    let { nome_categoria, obs_categoria } = req.body;
 
-    //console.log(nome_categoria, tipo_categoria);
+    //console.log(nome_categoria, obs_categoria);
 
-    categoriaModel.create({ nome_categoria, tipo_categoria })
+    categoria.create({ nome_categoria, obs_categoria })
         .then(() => {
             return res.status(201).json({
                 errorStatus: false,
@@ -29,7 +28,7 @@ router.post("/categoria/cadastrarCategoria", (req, res) => {
 
 //ROTA DE LISTAGEM DE CATEGORIA
 router.get("/categoria/listarCategoria", (req, res) => {
-    categoriaModel.findAll()
+    categoria.findAll()
         .then((categorias) => {
             return res.status(200).json(categorias);
         })
@@ -46,7 +45,7 @@ router.get("/categoria/listarCategoria", (req, res) => {
 router.get("/categoria/listarID/:cod_categoria", (req, res) => {
     let { cod_categoria } = req.params;
 
-    categoriaModel.findByPk(cod_categoria)
+    categoria.findByPk(cod_categoria)
         .then((categoria) => {
             if (!categoria) {
                 return res.status(404).json({
@@ -67,10 +66,10 @@ router.get("/categoria/listarID/:cod_categoria", (req, res) => {
 
 //ROTA DE ALTERAÇÃO DE CATEGORIA
 router.put("/categoria/editarCategoria", (req, res) => {
-    let { tipo_categoria, nome_categoria, cod_categoria } = req.body;
+    let { obs_categoria, nome_categoria, cod_categoria } = req.body;
 
-    categoriaModel.update(
-        { nome_categoria, tipo_categoria },
+    categoria.update(
+        { nome_categoria, obs_categoria },
         { where: { cod_categoria } }
     )
         .then((categoria) => {
@@ -95,7 +94,7 @@ router.put("/categoria/editarCategoria", (req, res) => {
 router.delete("/categoria/excluirCategoria/:cod_categoria", (req, res) => {
     let {cod_categoria} = req.params;
 
-    categoriaModel.destroy(
+    categoria.destroy(
         { where: { cod_categoria } }
     )
     .then((categoria) => {

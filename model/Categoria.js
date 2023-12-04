@@ -4,14 +4,6 @@ const sequelize = require("sequelize");
 //IMPORTAÇÃO DA CONEXÃO COM O BANCO DE DADOS
 const connection = require("../database/database");
 
-/*
-MAPEAMENTO DA TABELA DE CATEGORIA
-
-PARÂMETROS DO MÉTODO DEFINE
-1° - NOME DA TABELA
-2° - CAMPOS DA TABELA E SUAS REGRAS (DEVE SER UM JSON 
-
-*/
 const Categoria = connection.define(
     'tbl_categorias',
     {
@@ -24,7 +16,7 @@ const Categoria = connection.define(
             type: sequelize.STRING(250),
             allowNull: false
         },
-        tipo_categoria:{
+        obs_categoria:{
             type: sequelize.DECIMAL(10, 2),
             allowNull: false
         }
