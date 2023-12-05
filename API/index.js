@@ -13,10 +13,6 @@ app.use(express.urlencoded({ extended: true }));
 const connection = require("./database/database");
 console.log(connection);
 
-//TESTE DE MODEL PARA A CRIAÇÃO DAS TABELAS
-const CategoriaModel = require('./model/Categoria');
-const ProdutoModel = require('./model/Produto');
-
 //IMPORTAÇÃO DA CONTROLLER DE CATEGORIA
 const CategoriaController = require("./controller/CategoriaController");
 app.use("/", CategoriaController);

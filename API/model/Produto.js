@@ -1,11 +1,10 @@
-/*Importação do módulo do Sequelize*/
+/*IMPORTAÇÃO DO MÓDULO DO SEQUELIZE*/
 const Sequelize = require('sequelize');
 
-/*Importação da conexão com o banco de dados*/
+/*IMPORTAÇÃO DA CONEXÃO COM O BANCO DE DADOS*/
 const connection = require('../database/database');
 
-/*Importação da tabela de categoria para criação da chave estrangeira
-representanto a cardinalidade*/
+/*IMPORTAÇÃO DA TABELA CATEGORIA PARA CRIAÇÃO DE CHAVE ESTRANGEIRA REPRESENTANDO A CARDINALIDADE*/
 const Categoria = require('./Categoria');
 
 const Produtos = connection.define(
@@ -21,15 +20,15 @@ const Produtos = connection.define(
             allowNull: false
         },
         nome_produto:{
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(255),
             allowNull: false
         },
         preco_produto:{
-            type: Sequelize.STRING,
+            type: Sequelize.DECIMAL(10, 2),
             allowNull: false
         },
         imagem_produto:{
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(500),
             allowNull: false
         },
         imagem_produto_url:{
@@ -43,13 +42,13 @@ const Produtos = connection.define(
     }
 );
 
-/*Implementação da  CHAVE ESTRANGEIRA - LADO N*/
+/*IMPLEMENTAÇÃO DA CHAVE ESTRANGEIRA - LADO N*/
 Categoria.hasMany(Produtos, {
     foreignKey: 'codigo_categoria',
     sourceKey: 'codigo_categoria'
 });
 
-/*Implementação da  CHAVE PRIMÁRIA - LADO 1*/
+/*IMPLEMENTAÇÃO DA CHAVE PRIMÁRIA - LADO 1*/
 Produtos.belongsTo(Categoria, {
     foreignKey: 'codigo_categoria',
     sourceKey: 'codigo_categoria'

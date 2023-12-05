@@ -9,8 +9,6 @@ const router = express.Router();
 router.post("/categoria/cadastrarCategoria", (req, res) => {
     let { nome_categoria, obs_categoria } = req.body;
 
-    //console.log(nome_categoria, obs_categoria);
-
     categoria.create({ nome_categoria, obs_categoria })
         .then(() => {
             return res.status(201).json({
@@ -42,10 +40,10 @@ router.get("/categoria/listarCategoria", (req, res) => {
 
 //ROTA DE BUSCA DE CATEGORIA POR ID
 
-router.get("/categoria/listarID/:cod_categoria", (req, res) => {
-    let { cod_categoria } = req.params;
+router.get("/categoria/listarID/:codigo_categoria", (req, res) => {
+    let { codigo_categoria } = req.params;
 
-    categoria.findByPk(cod_categoria)
+    categoria.findByPk(codigo_categoria)
         .then((categoria) => {
             if (!categoria) {
                 return res.status(404).json({
@@ -66,11 +64,11 @@ router.get("/categoria/listarID/:cod_categoria", (req, res) => {
 
 //ROTA DE ALTERAÇÃO DE CATEGORIA
 router.put("/categoria/editarCategoria", (req, res) => {
-    let { obs_categoria, nome_categoria, cod_categoria } = req.body;
+    let { obs_categoria, nome_categoria, codigo_categoria } = req.body;
 
     categoria.update(
         { nome_categoria, obs_categoria },
-        { where: { cod_categoria } }
+        { where: { codigo_categoria } }
     )
         .then((categoria) => {
             if (categoria == !categoria) {
@@ -79,7 +77,7 @@ router.put("/categoria/editarCategoria", (req, res) => {
                     messageStatus: "Categoria não encontrada!",
                 });
             } else {
-                return res.status(200).json(`O nome da categoria correspondente pelo código ${cod_categoria} agora é ${nome_categoria}`)
+                return res.status(200).json(`O nome da categoria correspondente pelo código ${codigo_categoria} agora é ${nome_categoria}`)
             }
         })
         .catch((error) => {
@@ -91,11 +89,11 @@ router.put("/categoria/editarCategoria", (req, res) => {
 });
 
 //ROTA DE EXCLUSÃO DE CATEGORIA
-router.delete("/categoria/excluirCategoria/:cod_categoria", (req, res) => {
-    let {cod_categoria} = req.params;
+router.delete("/categoria/excluirCategoria/:codigo_categoria", (req, res) => {
+    let {codigo_categoria} = req.params;
 
     categoria.destroy(
-        { where: { cod_categoria } }
+        { where: { codigo_categoria } }
     )
     .then((categoria) => {
         if (categoria == !categoria) {
@@ -104,7 +102,7 @@ router.delete("/categoria/excluirCategoria/:cod_categoria", (req, res) => {
                 messageStatus: "Categoria não encontrada!",
             });
         } else {
-            return res.status(200).json(`O nome da categoria correspondente pelo código ${cod_categoria} foi excluída com sucesso!`)
+            return res.status(200).json(`A categoria correspondente pelo código ${codigo_categoria} foi excluída com sucesso!`)
         }
     })
     .catch((error) => {

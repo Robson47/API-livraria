@@ -1,11 +1,9 @@
 const express = require('express');
-const app = express();
 const router = express.Router();
 const upload = require('../helpers/upload/uploadImg');
-const multer = require('multer');
 const produto = require('../model/Produto');
-const { initializeApp, FirebaseError } = require('firebase/app');
-const { getStorage, ref, getDownloadURL, uploadBytes, listAll, deleteObject } = require('firebase/storage');
+const { initializeApp } = require('firebase/app');
+const { getStorage, ref, getDownloadURL, uploadBytes } = require('firebase/storage');
 const deleteImage = require('../helpers/upload/deleteImagem');
 
 require("dotenv").config()
@@ -21,20 +19,7 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
-
 const storage = getStorage(firebaseApp);
-
-router.post('/test-upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({
-            erroStatus: true,
-            erroMensagem: 'Nenhum arquivo enviado.',
-        });
-    }
-
-    console.log('Requisição de teste de upload recebida:', req.file);
-    res.json({ message: 'Teste de upload concluído.' });
-});
 
 router.post('/prod/cadastrarProduto', upload.single('file'), (req, res) => {
     console.log('Requisição de upload recebida:', req.file);
@@ -61,14 +46,7 @@ router.post('/prod/cadastrarProduto', upload.single('file'), (req, res) => {
         })
         .then((urlFinal) => {
             console.log('URL do arquivo:', urlFinal);
-            return produto.create({
-                nome_produto,
-                preco_produto,
-                imagem_produto: fileName,
-                imagem_produto_url: urlFinal,
-                descricao_produto,
-                codigo_categoria,
-            });
+            return produto.create({ nome_produto, preco_produto, imagem_produto: fileName, imagem_produto_url: urlFinal, descricao_produto, codigo_categoria });
         })
         .then(() => {
             console.log('Produto criado com sucesso');
@@ -142,7 +120,7 @@ router.delete('/prod/excluirProduto/:codigo_produto', (req, res) => {
 router.put('/prod/editarProduto/', (req, res) => {
 
     const { nome_produto, preco_produto, descricao_produto, imagem_produto, imagem_produto_url, codigo_categoria, codigo_produto } = req.body;
-    /** UPDATE SEM IMAGEM **/
+
     produto.update({ nome_produto, preco_produto, descricao_produto, imagem_produto, imagem_produto_url, codigo_categoria, codigo_produto },
         { where: { codigo_produto } }
     ).then(
