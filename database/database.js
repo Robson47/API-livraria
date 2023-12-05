@@ -4,7 +4,7 @@ const sequelize = require("sequelize");
 const connection = new sequelize(
     "api_produtos",
     "root",
-    "",
+    "12345",
     {
         host: "localhost",
         port: "3306",

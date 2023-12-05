@@ -17,7 +17,7 @@ const Categoria = connection.define(
             allowNull: false
         },
         obs_categoria:{
-            type: sequelize.DECIMAL(10, 2),
+            type: sequelize.STRING(250),
             allowNull: false
         }
     }

@@ -15,15 +15,15 @@ console.log(connection);
 
 //TESTE DE MODEL PARA A CRIAÇÃO DAS TABELAS
 const CategoriaModel = require('./model/Categoria');
-const LivroModel = require('./model/Livro');
+const ProdutoModel = require('./model/Produto');
 
 //IMPORTAÇÃO DA CONTROLLER DE CATEGORIA
 const CategoriaController = require("./controller/CategoriaController");
 app.use("/", CategoriaController);
 
-//IMPORTAÇÃO DA CONTROLLER DE LIVRO
-const LivroController = require("./controller/LivroController");
-app.use("/", LivroController);
+//IMPORTAÇÃO DA CONTROLLER DE Produto
+const ProdutoController = require("./controller/ProdutoController");
+app.use("/", ProdutoController);
 
 //CRIAÇÃO DO SERVIDOR WEB DE REQUISIÇÕES E RESPOSTAS
 app.listen(3000, () => {

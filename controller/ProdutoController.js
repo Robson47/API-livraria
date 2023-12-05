@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const upload = require('../helpers/upload/uploadImg');
+const multer = require('multer');
 const produto = require('../model/Produto');
 const { initializeApp, FirebaseError } = require('firebase/app');
 const { getStorage, ref, getDownloadURL, uploadBytes, listAll, deleteObject } = require('firebase/storage');
@@ -19,59 +20,70 @@ const firebaseConfig = {
     measurementId: process.env.MEASUREMENT_ID
 };
 
-console.log(firebaseConfig);
-
 const firebaseApp = initializeApp(firebaseConfig);
 
 const storage = getStorage(firebaseApp);
 
-router.post('/prod/cadastrarProduto', upload.array('files', 1), (req, res) => {
+router.post('/test-upload', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({
+            erroStatus: true,
+            erroMensagem: 'Nenhum arquivo enviado.',
+        });
+    }
+
+    console.log('Requisição de teste de upload recebida:', req.file);
+    res.json({ message: 'Teste de upload concluído.' });
+});
+
+router.post('/prod/cadastrarProduto', upload.single('file'), (req, res) => {
+    console.log('Requisição de upload recebida:', req.file);
     const { nome_produto, preco_produto, descricao_produto, codigo_categoria } = req.body;
-    const files = req.files;
+    const file = req.file;
 
-    console.log(req);
+    if (!file) {
+        return res.status(400).json({
+            erroStatus: true,
+            erroMensagem: 'Nenhum arquivo enviado.',
+        });
+    }
 
-    let imagem_produto, imagem_produto_url;
-    let cont = 0;
+    const fileName = Date.now().toString() + '-' + file.originalname;
+    console.log('Nome do arquivo:', fileName);
 
-    files.forEach(file => {
-        const fileName = Date.now().toString() + '-' + file.originalname;
-        const fileRef = ref(storage, fileName);
+    const fileRef = ref(storage, fileName);
 
-        uploadBytes(fileRef, file.buffer)
-            .then((snapshot) => {
-                imageRef = ref(storage, snapshot.metadata.name);
-                getDownloadURL(imageRef)
-                    .then((urlFinal) => {
-                        if (cont == 0) {
-                            imagem_produto = fileName;
-                            imagem_produto_url = urlFinal;
-                            cont++;
-                            console.log('Nome da imagem peq ' + imagem_produto);
-                            console.log('URL da imagem peq ' + imagem_produto_url);
-                        } 
-                        if (imagem_produto) {
-                            //GRAVAÇÃO DOS ProdutoS NO BANCO DE DADOS
-                            produto.create({ nome_produto, preco_produto, imagem_produto, imagem_produto_url, descricao_produto, codigo_categoria })
-                                .then(() => {
-                                    return res.status(201).json({
-                                        erroStatus: false,
-                                        mensagemStatus: 'Produto inserido com sucesso.'
-                                    });
-                                }
-                                ).catch((erro) => {
-                                    return res.status(400).json({
-                                        erroStatus: true,
-                                        erroMensagem: erro
-                                    });
-                                });
-                        }
-                    })
-            })
-            .catch((error) => {
-                res.send('Erro: ' + error)
+    uploadBytes(fileRef, file.buffer)
+        .then((snapshot) => {
+            console.log('Upload bem-sucedido:', snapshot);
+            const imageRef = ref(storage, snapshot.metadata.name);
+            return getDownloadURL(imageRef);
+        })
+        .then((urlFinal) => {
+            console.log('URL do arquivo:', urlFinal);
+            return produto.create({
+                nome_produto,
+                preco_produto,
+                imagem_produto: fileName,
+                imagem_produto_url: urlFinal,
+                descricao_produto,
+                codigo_categoria,
             });
-    });
+        })
+        .then(() => {
+            console.log('Produto criado com sucesso');
+            return res.status(201).json({
+                erroStatus: false,
+                mensagemStatus: 'Produto inserido com sucesso.',
+            });
+        })
+        .catch((error) => {
+            console.error('Erro durante o processo:', error);
+            res.status(400).json({
+                erroStatus: true,
+                erroMensagem: error,
+            });
+        });
 });
 
 router.get('/prod/listarProduto', (req, res) => {
@@ -127,7 +139,7 @@ router.delete('/prod/excluirProduto/:codigo_produto', (req, res) => {
         });
 });
 
-router.put('/prod/editarProduto', (req, res) => {
+router.put('/prod/editarProduto/', (req, res) => {
 
     const { nome_produto, preco_produto, descricao_produto, imagem_produto, imagem_produto_url, codigo_categoria, codigo_produto } = req.body;
     /** UPDATE SEM IMAGEM **/
