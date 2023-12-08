@@ -28,7 +28,7 @@ Certifique-se de ter configurado corretamente o arquivo "database.js" com as con
 
 ## Iniciando a Aplicação
 
-Inicie o servidor localmento com o seguinte comando:
+Inicie o servidor localmente com o seguinte comando:
 ```bash
 npm start
 ```
